@@ -3,7 +3,12 @@ class AutoPagerCalcSearch extends AutoPagerCalc {
         super()
         this.searchElQuery = searchElQuery
     }
-    async getPage() { console.log('Search.getPage()', this.limit, this.offset); return await window.myApi.searchPage(document.querySelector(this.searchElQuery).value, this.limit, this.offset) }
+    // inputイベント時の値が取得できない。引数で受け取るしかない。
+    //async getPage() { console.log('Search.getPage()', this.limit, this.offset); return await window.myApi.searchPage(document.querySelector(this.searchElQuery).value, this.limit, this.offset) }
+    // 親メソッドが呼ばれてしまう。JSはオーバーロードできない仕様。
+    //async getPage(keyword) { console.log('Search.getPage()', keyword, this.limit, this.offset); return await window.myApi.searchPage(keyword, this.limit, this.offset) }
+    async getSearchPage(keyword) { console.log('Search.getPage()', keyword, this.limit, this.offset); return await window.myApi.searchPage(keyword, this.limit, this.offset) }
+
     async getCount() { console.log('Search.getCount()'); return await window.myApi.searchCount(document.querySelector(this.searchElQuery).value) }
     /*
     async clear() {

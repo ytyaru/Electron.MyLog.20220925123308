@@ -18,7 +18,9 @@ class AutoPagerCalc {
     async next() {
         //console.log('AutoPagerCalc.next()')
         console.log(`${this.constructor.name}.next(), count:${this.count} page:${this.page} limit:${this.limit} offset:${this.offset}`)
-        if (this.offset < this.count && this.limit < this.count) {
+        //if (this.count <= this.limit) { return true }
+        //if (this.offset < this.count && this.limit < this.count) {
+        if (this.offset < this.count) {
             this.page++;
             this.offset = this.limit * this.page
             console.log(this.limit, this.offset)

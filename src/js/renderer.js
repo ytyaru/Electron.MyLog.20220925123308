@@ -24,43 +24,6 @@ window.addEventListener('DOMContentLoaded', async(event) => {
     })
     const git = new Git(setting)
     const hub = new GitHub(setting)
-    document.querySelector('#search').addEventListener('input', async(e)=>{
-        //pager.clear()
-        if (0 < e.target.value.length) {
-            console.log('検索キーワード：', e.target.value)
-            //pager.mode = 'search'
-            await pager.changeMode('search')
-            /*
-            const records = await pager.pager[pager.mode].next()
-            //const records = await window.myApi.search(e.target.value)
-            console.log(records)
-            if (records) {
-                document.getElementById('post-list').innerHTML = records.map(r=>TextToHtml.toHtml(r[0], r[1], r[2], document.getElementById('address').value)).join('')
-            } else { document.getElementById('post-list').innerHTML = '' }
-            */
-        } else {
-            console.log('最新取得モード：')
-            //pager.mode = 'all'
-            await pager.changeMode('all')
-            /*
-            //const records = await window.myApi.getPage(20, 0)
-            const records = await pager.pager[pager.mode].next()
-            document.getElementById('post-list').innerHTML = records.map(r=>TextToHtml.toHtml(r[0], r[1], r[2], document.getElementById('address').value)).join('')
-            */
-        }
-        await pager.next()
-        /*
-        const next = await pager.pager[pager.mode].next()
-        console.log('next:', next)
-        if (next) {
-            const records = await pager.pager[pager.mode].getPage()
-            console.log(records)
-            if (records) {
-                document.getElementById('post-list').innerHTML = records.map(r=>TextToHtml.toHtml(r[0], r[1], r[2], document.getElementById('address').value)).join('')
-            } else { document.getElementById('post-list').innerHTML = '' }
-        }
-        */
-    })
     document.querySelector('#post').addEventListener('click', async()=>{
         try {
             await insert()

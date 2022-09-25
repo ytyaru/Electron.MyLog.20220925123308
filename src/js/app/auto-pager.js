@@ -7,31 +7,10 @@ class AutoPager {
             'all': new AutoPagerCalc(),
             'search': new AutoPagerCalcSearch(searchElQuery),
         }
-        /*
-        this.pages = {
-            'all': {
-                'pager': new AutoPagerCalc(),
-                'count': 0,
-                'page': -1,
-                'limit': 20,
-                'offset': 0,
-            },
-            'search': {
-                'pager': new AutoPagerCalcSearch(),
-                'count': 0,
-                'page': -1,
-                'limit': 20,
-                'offset': 0,
-            }
-        }
-        this.limit = 20
-        this.page = -1
-        this.offset = this.limit * this.page
-        this.count = 0
-        */
         this.setting = setting
-        //this.ui = document.querySelector('#post-list')
-        this.ui = document.querySelector(scrollElQuery)
+        //this.scrollEl = document.querySelector('#post-list')
+        this.scrollEl = document.querySelector(scrollElQuery)
+        this.searchEl = document.querySelector(searchElQuery)
         this.timeoutId = 0
         //console.log('AutoPager.count:', this.count, this.offset)
     }
@@ -41,32 +20,35 @@ class AutoPager {
         this.mode = mode
         console.log('AutoPager.changeMode():', 'this.clear()')
         await this.clear()
-        this.ui.innerHTML = ''
-        //this.ui.innerHTML = ''
+        this.scrollEl.innerHTML = ''
     }
     //async setup(scrollElId, searchElId, mode='all') {
     async setup() {
         console.log('AutoPager.setup()')
         this.mode = 'all'
         await this.clear()
-        //await this.pager['all'].clear()
-        //await this.pager['search'].clear()
-        //this.count = await this.pager[this.mode].getCount()
         //this.count = await window.myApi.count()
-        this.ui.addEventListener('scroll', async(event) => {
+        this.scrollEl.addEventListener('scroll', async(event) => {
             clearTimeout(this.timeoutId);
             this.timeoutId = setTimeout(async()=>{
                 if (this.#isFullScrolled(event)) {
                     console.log('scroll event!!:', this.mode)
                     //this.#toHtml(await this.#next())
-                    await this.next()
+                    //await this.next()
+                    this.next(this.searchEl.value)
                 }
             }, 200);
         })
-        this.next()
+        this.searchEl.addEventListener('input', async(e)=>{
+            await this.changeMode((0 < e.target.value.length) ? 'search' : 'all')
+            await this.next(e.target.value)
+        })
+        this.next(this.searchEl.value)
+        //this.next()
         //this.#toHtml(await this.#next())
     }
-    async next() { this.#toHtml(await this.#next()) }
+    //async next() { this.#toHtml(await this.#next()) }
+    async next(keyword) { this.#toHtml(await this.#next(keyword)) }
     async clear(mode=null) {
         if (mode) { await this.pager[mode].clear() }
         else { for await (var m of this.MODES) { await this.pager[m].clear() } }
@@ -77,13 +59,21 @@ class AutoPager {
         console.log(`isFullScrolled: ${positionWithAdjustmentValue >= event.target.scrollHeight}`)
         return positionWithAdjustmentValue >= event.target.scrollHeight
     }
-    async #next() {
+    async #next(keyword) {
         console.log('AutoPager.next(): ', this.mode)
         const next = await this.pager[this.mode].next()
-        console.log('next():', next)
-        if (next) {
-            return await this.pager[this.mode].getPage()
+        console.log('next():', next, this.mode)
+        switch (this.mode) {
+            case 'all': return await this.pager[this.mode].getPage(keyword)
+            case 'search': return await this.pager[this.mode].getSearchPage(keyword)
+            default: throw new Error(`this.modeは all か search にしてください。`)
         }
+        //return await this.pager[this.mode].getPage(keyword)
+        /*
+        if (next) {
+            return await this.pager[this.mode].getPage(keyword)
+        }
+        */
         /*
         if (this.offset < this.count) {
             this.page++;
@@ -97,7 +87,7 @@ class AutoPager {
     #toHtml(records) {
         console.log(records)
         if (records) {
-            this.ui.insertAdjacentHTML('beforeend', records.map(r=>TextToHtml.toHtml(r[0], r[1], r[2], this.setting.mona.address)).join(''))
+            this.scrollEl.insertAdjacentHTML('beforeend', records.map(r=>TextToHtml.toHtml(r[0], r[1], r[2], this.setting.mona.address)).join(''))
         }
     }
 }
